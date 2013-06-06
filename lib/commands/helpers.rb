@@ -1,4 +1,6 @@
 DEV_NULL = File.exist?("/dev/null") ? "/dev/null" : "nul:" unless const_defined?("DEV_NULL")
+token = File.read(File.expand_path "~/.github-auth").chomp
+ACCESS_TOKEN_STRING = "?access_token=#{token}"
 
 helper :user_and_repo_from do |url|
   case url
@@ -241,7 +243,7 @@ helper :private_url_for do |user|
 end
 
 helper :homepage_for do |user, branch|
-  "https://github.com/#{user}/#{project}/tree/#{branch}"
+  "https://api.github.com/#{user}/#{project}/branches/#{branch}#{ ACCESS_TOKEN_STRING }"
 end
 
 helper :network_page_for do |user|
@@ -250,15 +252,15 @@ end
 
 helper :network_meta_for do |user|
   p "https://github.com/#{user}/#{project}/network_meta"
-  "https://github.com/#{user}/#{project}/network_meta"
+  "https://github.com/#{user}/#{project}/network_meta#{ ACCESS_TOKEN_STRING }"
 end
 
 helper :issues_page_for do |user|
-  "https://github.com/#{user}/#{project}/issues"
+  "https://github.com/repos/#{user}/#{project}/issues#{ ACCESS_TOKEN_STRING }"
 end
 
 helper :list_issues_for do |user, state|
-  "https://github.com/api/v2/yaml/issues/list/#{user}/#{project}/#{state}"
+  "https://api.github.com/repos/#{user}/#{project}/issues/#{state}#{ ACCESS_TOKEN_STRING }"
 end
 
 helper :has_launchy? do |blk|
@@ -389,7 +391,7 @@ helper :github_token do
 end
 
 helper :cache_data do |user|
-  `curl -b #{cookie_cache_path} -c #{cookie_cache_path} -s -L -u '#{github_user}'  #{network_meta_for(user)} -o #{network_cache_path}`
+  `curl -s -L #{network_meta_for(user)} -o #{network_cache_path}`
   get_cache
 end
 

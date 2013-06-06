@@ -142,7 +142,7 @@ command :clone do |user, repo, dir|
   die "Specify a user to pull from" if user.nil?
   if options[:search]
     query = [user, repo, dir].compact.join(" ")
-    data = JSON.parse(open("https://github.com/api/v1/json/search/#{URI.escape query}").read)
+    data = JSON.parse(open("https://api.github.com/search/#{URI.escape query}").read)
     if (repos = data['repositories']) && !repos.nil? && repos.length > 0
       repo_list = repos.map do |r|
         { "name" => "#{r['username']}/#{r['name']}", "description" => r['description'] }
